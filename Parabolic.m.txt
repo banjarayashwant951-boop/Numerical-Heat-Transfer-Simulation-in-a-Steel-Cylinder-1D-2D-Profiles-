@@ -1,0 +1,65 @@
+L = 0.1;              % Length (m)
+d = 0.01;             % Diameter (m)
+r=d/2;                %Radius(m)
+k = 10;               % Thermal conductivity (W/m-K)
+T0 = 100;             % Temperature at x=0 (C)
+Tamb = 30;            % Ambient temperature (C)
+h = 50;               % Convective heat transfer coefficient (W/m^2-K)
+N = 500;               % Number of nodes
+density=10000;       %Density(Kg/m^3)
+cp=100;              %J/Kg-K
+dt=.1;                %time step size
+dx = L / (N-1);       %distance step size
+% Preallocate tridiagonal vectors
+a = zeros(N,1);   
+b = zeros(N,1);  
+c = zeros(N,1);  
+d = zeros(N,1);
+T = 30*ones(N,1);
+% Boundary condition at x = 0
+a(1) = -k/(2*density*cp*dx^2);
+b(1)=1/dt +k/(density*cp*dx^2)+h/(density*cp*r);
+c(1)=-k/(2*density*cp*dx^2);
+% BC at x=L: dT/dx = 0)
+a(N) = -k/(density*cp*dx^2);
+b(N) = 1/dt +k/(density*cp*dx^2)+h/(density*cp*r);
+c(N) = -k/(2*density*cp*dx^2);
+% Interior nodes
+for i = 2:N-1
+    a(i) = -k/(2*density*cp*dx^2);
+    b(i) =1/dt +k/(density*cp*dx^2)+h/(density*cp*r);
+    c(i) =  -k/(2*density*cp*dx^2);
+    
+end
+for j=1:500
+d(1) =k/(2*density*cp*dx^2)*T0+(1/dt-k/(density*cp*dx^2)-h/(density*cp*r))*T(1)+k/(2*density*cp*dx^2)*T(2)+2*h/(density*cp*r)*30-a(1)*T0 ;
+for i=2:N-1
+d(i) = k/(2*density*cp*dx^2)*T(i-1)+(1/dt-k/(density*cp*dx^2)-h/(density*cp*r))*T(i)+k/(2*density*cp*dx^2)*T(i+1)+2*h/(density*cp*r)*30;
+end
+d(N) =  k/(density*cp*dx^2)*T(N-1)+(1/dt-k/(density*cp*dx^2)-h/(density*cp*r))*T(N)+2*h/(density*cp*r)*Tamb;
+T=Thomasalgo(N,a,b,c,d,T);
+ if rem(j,100) == 0
+       x = linspace(dx, L, N);
+plot(x, T, '-', 'LineWidth', 1);
+        hold on ;
+ end
+end
+disp(T)
+% Plot result
+xlabel('Length of the cylinder (m)');
+ylabel('Temperature (°C)');
+title('Axial Temperature Profile');
+grid on;
+function T=Thomasalgo(N,a,b,c,d,T)
+% Thomas algorithm: forward sweep
+for i = 2:N
+    m = a(i)/b(i-1);
+    b(i) = b(i) - m * c(i-1);
+    d(i) = d(i) - m * d(i-1);
+end
+% Back substitution
+T(N) = d(N)/b(N);
+for i = N-1:-1:1
+    T(i) = (d(i) - c(i)*T(i+1)) / b(i);
+end
+end
