@@ -16,7 +16,7 @@ The study includes:
 
 ## Tools & Methods
 - **Numerical Methods**: Finite Difference Method (FDM) for solving parabolic and elliptic PDEs.  
-- **Programming**: [MATLAB / Python / COMSOL] (specify whichever you used).  
+- **Programming**: MATLAB 
 - **Visualization**: Temperature profiles plotted for comparison across cases.  
 
 ## Results
@@ -28,7 +28,3 @@ The study includes:
 - Thermal system design and optimization.  
 - Educational demonstration of heat conduction principles.  
 - Benchmarking for numerical PDE solvers.  
-
----
-
-✦ *This repository serves as a demonstration of heat conduction modeling and analysis using numerical simulations.*
